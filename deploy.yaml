@@ -14,15 +14,16 @@ spec:
     spec:
       containers:
       - name: mongodb
-        image: mongo:3.6.5-jessie
+        image: mongo:3.6.23
         volumeMounts:
-          - name: mongo-persistent-storage
-            mountPath: /data/db
-      volumes:
         - name: mongo-persistent-storage
-          # pointer to the configuration of HOW we want the mount to be implemented
-          persistentVolumeClaim:
-            claimName: mongo-pvc
+          mountPath: /data/db
+      volumes:
+      - name: mongo-persistent-storage
+        # pointer to the configuration of HOW we want the mount to be implemented
+        persistentVolumeClaim:
+          claimName: mongo-pvc
+
 ---
 # What do want?
 apiVersion: v1
@@ -32,10 +33,11 @@ metadata:
 spec:
   storageClassName: mylocalstorage
   accessModes:
-    - ReadWriteOnce
+  - ReadWriteOnce
   resources:
     requests:
       storage: 2Gi
+
 ---
 # How do we want it implemented
 apiVersion: v1
@@ -47,10 +49,11 @@ spec:
   capacity:
     storage: 2Gi
   accessModes:
-    - ReadWriteOnce
+  - ReadWriteOnce
   hostPath:
     path: "/mnt/mongodb/"
     type: DirectoryOrCreate
+
 ---
 kind: Service
 apiVersion: v1
@@ -60,6 +63,6 @@ spec:
   selector:
     app: mongodb
   ports:
-    - name: mongoport
-      port: 27017
+  - name: mongoport
+    port: 27017
   type: ClusterIP
